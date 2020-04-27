@@ -1,38 +1,43 @@
 # network section
 variable "v4_network_name" {
   type    = string
-  default = "ske-ip4-network"
+  default = "rap-ip4-network"
 }
 
 variable "v6_network_name" {
   type    = string
-  default = "ske-ip6-network"
+  default = "rap-ip6-network"
 }
 
 # instance section
 variable "master_instance_names" {
   type = set(string)
   default = [
-    "ske_master_1",
-    "ske_master_2",
-    "ske_master_3"
+    "rap_master_1"
   ]
 }
 
 variable "worker_instance_names" {
   type = set(string)
   default = [
-    "ske_worker_1",
-    "ske_worker_2",
-    "ske_worker_3"
+    "rap_worker_1"
   ]
 }
 
 variable "lb_instance_names" {
   type = set(string)
   default = [
-    "ske_load_balancer"
+    "rap_load_balancer"
   ]
 }
 
+variable "image_id" {
+  type    = string
+  default = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+}
+
+variable "flavor_name" {
+  type    = string
+  default = "c1.2"
+}
 

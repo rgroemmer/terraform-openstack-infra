@@ -67,12 +67,12 @@ resource "openstack_compute_floatingip_associate_v2" "fip_associate" {
 resource "openstack_compute_instance_v2" "ske_master" {
   for_each  = var.master_instance_names
   name      = each.key
-  image_id  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
-  flavor_id = "5fe737c2-18d8-43c6-bb11-dc9c97ff9515"
+  image_id  = var.image_id
+  flavor_id = data.openstack_compute_flavor_v2.flavor.id
   key_pair  = "ske-key"
 
   block_device {
-    uuid                  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+    uuid                  = var.image_id
     source_type           = "image"
     destination_type      = "volume"
     boot_index            = 0
@@ -92,12 +92,12 @@ resource "openstack_compute_instance_v2" "ske_master" {
 resource "openstack_compute_instance_v2" "ske_worker" {
   for_each  = var.worker_instance_names
   name      = each.key
-  image_id  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
-  flavor_id = "5fe737c2-18d8-43c6-bb11-dc9c97ff9515"
+  image_id  = var.image_id
+  flavor_id = data.openstack_compute_flavor_v2.flavor.id
   key_pair  = "ske-key"
 
   block_device {
-    uuid                  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+    uuid                  = var.image_id
     source_type           = "image"
     destination_type      = "volume"
     boot_index            = 0
@@ -117,17 +117,30 @@ resource "openstack_compute_instance_v2" "ske_worker" {
 resource "openstack_compute_instance_v2" "ske_lbs" {
   for_each  = var.lb_instance_names
   name      = each.key
-  image_id  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
-  flavor_id = "5fe737c2-18d8-43c6-bb11-dc9c97ff9515"
+  image_id  = var.image_id
+  flavor_id = data.openstack_compute_flavor_v2.flavor.id
   key_pair  = "ske-key"
 
   block_device {
-    uuid                  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+    uuid                  = var.image_id
     source_type           = "image"
     destination_type      = "volume"
     boot_index            = 0
     volume_size           = 20
     delete_on_termination = true
+  }
+
+  connection {
+    type        = "ssh"
+    host        = openstack_compute_floatingip_v2.fip.address
+    user        = "ubuntu"
+    private_key = file("./ssh-key/ske-key")
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "kubeadm init",
+    ]
   }
 
   network {
@@ -137,6 +150,10 @@ resource "openstack_compute_instance_v2" "ske_lbs" {
   network {
     name = openstack_networking_network_v2.network_ip6.name
   }
+}
+
+data "openstack_compute_flavor_v2" "flavor" {
+  name = var.flavor_name
 }
 
 output "fip" {

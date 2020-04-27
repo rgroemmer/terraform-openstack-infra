@@ -129,12 +129,11 @@ resource "openstack_compute_instance_v2" "ske_lbs" {
     volume_size           = 20
     delete_on_termination = true
   }
-
-  connection {
-    type        = "ssh"
-    host        = openstack_compute_floatingip_v2.fip.address
-    user        = "ubuntu"
-    private_key = file("./ssh-key/ske-key")
+    connection {
+    type = "ssh"
+    host = openstack_compute_floatingip_v2.fip.address
+    user = "ubuntu"
+    private
   }
 
   provisioner "remote-exec" {

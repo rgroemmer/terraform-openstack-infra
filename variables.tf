@@ -13,7 +13,9 @@ variable "v6_network_name" {
 variable "master_instance_names" {
   type = set(string)
   default = [
-    "rap_master_1"
+    "rap_master_1",
+    "rap_master_2",
+    "rap_master_3"
   ]
 }
 

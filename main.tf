@@ -52,6 +52,55 @@ resource "openstack_networking_router_interface_v2" "router_interface_v6" {
   subnet_id = openstack_networking_subnet_v2.subnet_ip6.id
 }
 
+# secgroup creation
+resource "openstack_networking_secgroup_v2" "securitygroup" {
+  name = "ske-securitygroup"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_ssh_v4" {
+  description       = "Allow SSH"
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 22
+  port_range_max    = 22
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.securitygroup.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_k8s_v4" {
+  description       = "Allow kube-apiserver"
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 6443
+  port_range_max    = 6443
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.securitygroup.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_ssh_v6" {
+  description       = "Allow SSH"
+  direction         = "ingress"
+  ethertype         = "IPv6"
+  protocol          = "tcp"
+  port_range_min    = 22
+  port_range_max    = 22
+  remote_ip_prefix  = "::/0"
+  security_group_id = openstack_networking_secgroup_v2.securitygroup.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_k8s_v6" {
+  description       = "Allow kube-apiserver"
+  direction         = "ingress"
+  ethertype         = "IPv6"
+  protocol          = "tcp"
+  port_range_min    = 6443
+  port_range_max    = 6443
+  remote_ip_prefix  = "::/0"
+  security_group_id = openstack_networking_secgroup_v2.securitygroup.id
+}
+
 # floating-ip creation
 resource "openstack_compute_floatingip_v2" "fip" {
   pool = "floating-net"
@@ -60,19 +109,20 @@ resource "openstack_compute_floatingip_v2" "fip" {
 resource "openstack_compute_floatingip_associate_v2" "fip_associate" {
   for_each    = var.lb_instance_names
   floating_ip = openstack_compute_floatingip_v2.fip.address
-  instance_id = openstack_compute_instance_v2.ske_lbs[each.key].id
+  instance_id = openstack_compute_instance_v2.ske_loadbalancer[each.key].id
 }
 
 # instance section
 resource "openstack_compute_instance_v2" "ske_master" {
-  for_each  = var.master_instance_names
-  name      = each.key
-  image_id  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
-  flavor_id = "5fe737c2-18d8-43c6-bb11-dc9c97ff9515"
-  key_pair  = "ske-key"
+  for_each        = var.master_instance_names
+  name            = each.key
+  image_id        = var.image_id
+  flavor_id       = data.openstack_compute_flavor_v2.flavor.id
+  key_pair        = "ske-key"
+  security_groups = [openstack_networking_secgroup_v2.securitygroup.id]
 
   block_device {
-    uuid                  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+    uuid                  = var.image_id
     source_type           = "image"
     destination_type      = "volume"
     boot_index            = 0
@@ -90,14 +140,15 @@ resource "openstack_compute_instance_v2" "ske_master" {
 }
 
 resource "openstack_compute_instance_v2" "ske_worker" {
-  for_each  = var.worker_instance_names
-  name      = each.key
-  image_id  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
-  flavor_id = "5fe737c2-18d8-43c6-bb11-dc9c97ff9515"
-  key_pair  = "ske-key"
+  for_each        = var.worker_instance_names
+  name            = each.key
+  image_id        = var.image_id
+  flavor_id       = data.openstack_compute_flavor_v2.flavor.id
+  key_pair        = "ske-key"
+  security_groups = [openstack_networking_secgroup_v2.securitygroup.id]
 
   block_device {
-    uuid                  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+    uuid                  = var.image_id
     source_type           = "image"
     destination_type      = "volume"
     boot_index            = 0
@@ -114,15 +165,16 @@ resource "openstack_compute_instance_v2" "ske_worker" {
   }
 }
 
-resource "openstack_compute_instance_v2" "ske_lbs" {
-  for_each  = var.lb_instance_names
-  name      = each.key
-  image_id  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
-  flavor_id = "5fe737c2-18d8-43c6-bb11-dc9c97ff9515"
-  key_pair  = "ske-key"
+resource "openstack_compute_instance_v2" "ske_loadbalancer" {
+  for_each        = var.lb_instance_names
+  name            = each.key
+  image_id        = var.image_id
+  flavor_id       = data.openstack_compute_flavor_v2.flavor.id
+  key_pair        = "ske-key"
+  security_groups = [openstack_networking_secgroup_v2.securitygroup.id]
 
   block_device {
-    uuid                  = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+    uuid                  = var.image_id
     source_type           = "image"
     destination_type      = "volume"
     boot_index            = 0
@@ -137,9 +189,45 @@ resource "openstack_compute_instance_v2" "ske_lbs" {
   network {
     name = openstack_networking_network_v2.network_ip6.name
   }
+}
+
+resource "null_resource" "provisioner" {
+  depends_on = [openstack_compute_floatingip_associate_v2.fip_associate]
+  connection {
+    type        = "ssh"
+    host        = openstack_compute_floatingip_v2.fip.address
+    user        = "ubuntu"
+    private_key = file("/home/groemmer/terraform-openshift/ssh-key/ske-key")
+    timeout     = "5m"
+  }
+
+  provisioner "file" {
+    content = templatefile("config/nginx.tmpl", {
+      ip_addrs = [for instance in openstack_compute_instance_v2.ske_master : instance.access_ip_v6],
+      port     = 6443
+    })
+    destination = "/tmp/nginx.conf"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get install -y nginx",
+      "sudo apt-get install -y nginx libnginx-mod-stream",
+      "sudo mv /tmp/nginx.conf /etc/nginx/nginx.conf",
+      "sudo systemctl restart nginx",
+      "sleep 20",
+    ]
+  }
+}
+
+data "openstack_compute_flavor_v2" "flavor" {
+  name = var.flavor_name
 }
 
 output "fip" {
   value = openstack_compute_floatingip_v2.fip.address
 }
 
+output "ip_v6" {
+  value = [for instance in openstack_compute_instance_v2.ske_master : instance.access_ip_v6]
+}

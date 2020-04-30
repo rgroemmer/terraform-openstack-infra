@@ -17,10 +17,8 @@ variable "image_id" {
 }
 
 variable "flavor_name" {
-  type    = string
-  default = "c1.2"
+  type = string
 }
-
 
 variable "master_node_names" {
   type = set(string)
@@ -35,6 +33,26 @@ variable "lb_names" {
 }
 
 # network vars
-variable "network_name" {
+variable "network_prefix" {
   type = string
+}
+
+variable "secgroup_prefix" {
+  type = string
+}
+
+variable "ext_ports" {
+  type = map(object({
+    min      = number
+    max      = number
+    protocol = string
+  }))
+}
+
+variable "int_ports" {
+  type = map(object({
+    min      = number
+    max      = number
+    protocol = string
+  }))
 }

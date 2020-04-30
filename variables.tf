@@ -1,41 +1,19 @@
-# network section
-variable "v4_network_name" {
-  type    = string
-  default = "rap-ip4-network"
+# provider vars
+variable "username" {
+  description = "openstack username for provider auth"
 }
 
-variable "v6_network_name" {
-  type    = string
-  default = "rap-ip6-network"
+variable "password" {
+  description = "openstack password for provider auth"
 }
 
-# instance section
-variable "master_instance_names" {
-  type = set(string)
-  default = [
-    "rap_master_1",
-    "rap_master_2",
-    "rap_master_3"
-  ]
+variable "tenant_name" {
+  description = "openstack project name"
 }
 
-variable "worker_instance_names" {
-  type = set(string)
-  default = [
-    "rap_worker_1"
-  ]
-}
-
-variable "lb_instance_names" {
-  type = set(string)
-  default = [
-    "rap_load_balancer"
-  ]
-}
-
+# instance vars
 variable "image_id" {
-  type    = string
-  default = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+  type = string
 }
 
 variable "flavor_name" {
@@ -43,3 +21,20 @@ variable "flavor_name" {
   default = "c1.2"
 }
 
+
+variable "master_node_names" {
+  type = set(string)
+}
+
+variable "worker_node_names" {
+  type = set(string)
+}
+
+variable "lb_names" {
+  type = set(string)
+}
+
+# network vars
+variable "network_name" {
+  type = string
+}

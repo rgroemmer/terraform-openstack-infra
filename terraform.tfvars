@@ -11,7 +11,7 @@ worker_node_names = [
 ]
 
 lb_name     = "lb_1"
-image_id    = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+image_id    = "38e194d3-16b9-43a7-af1d-9ffcaa98c746" // ubuntu_k8s_1.18.2_docker
 flavor_name = "c1.2"
 // key_pair_name = 
 // private_key_path = 

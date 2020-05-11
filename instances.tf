@@ -4,7 +4,7 @@ resource "openstack_compute_instance_v2" "ske_master" {
   name            = each.key
   image_id        = var.image_id
   flavor_id       = data.openstack_compute_flavor_v2.flavor.id
-  key_pair        = "ske-key"
+  key_pair        = var.key_pair_name
   security_groups = [openstack_networking_secgroup_v2.external.id]
 
   block_device {
@@ -30,7 +30,7 @@ resource "openstack_compute_instance_v2" "ske_worker" {
   name            = each.key
   image_id        = var.image_id
   flavor_id       = data.openstack_compute_flavor_v2.flavor.id
-  key_pair        = "ske-key"
+  key_pair        = var.key_pair_name
   security_groups = [openstack_networking_secgroup_v2.external.id]
 
   block_device {
@@ -52,11 +52,10 @@ resource "openstack_compute_instance_v2" "ske_worker" {
 }
 
 resource "openstack_compute_instance_v2" "ske_loadbalancer" {
-  for_each        = var.lb_names
-  name            = each.key
+  name            = var.lb_name
   image_id        = var.image_id
   flavor_id       = data.openstack_compute_flavor_v2.flavor.id
-  key_pair        = "ske-key"
+  key_pair        = var.key_pair_name
   security_groups = [openstack_networking_secgroup_v2.external.id]
 
   block_device {

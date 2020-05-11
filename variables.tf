@@ -1,12 +1,4 @@
-# instance vars
-variable "image_id" {
-  type = string
-}
-
-variable "flavor_name" {
-  type = string
-}
-
+## instance ##
 variable "master_node_names" {
   type = set(string)
 }
@@ -15,11 +7,28 @@ variable "worker_node_names" {
   type = set(string)
 }
 
-variable "lb_names" {
-  type = set(string)
+variable "lb_name" {
+  type = string
 }
 
-# network vars
+variable "image_id" {
+  type = string
+}
+
+variable "flavor_name" {
+  type = string
+}
+
+variable "key_pair_name" {
+  type        = string
+  description = "name of an existing key, to access instance via ssh"
+}
+
+variable "private_key_path" {
+  type = string
+}
+
+## network ##
 variable "network_prefix" {
   type = string
 }

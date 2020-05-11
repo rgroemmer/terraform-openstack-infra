@@ -4,7 +4,7 @@ resource "null_resource" "provisioner" {
     type        = "ssh"
     host        = openstack_compute_floatingip_v2.fip.address
     user        = "ubuntu"
-    private_key = file("/home/groemmer/terraform-openshift/ssh-key/ske-key")
+    private_key = file(var.private_key_path)
     timeout     = "5m"
   }
 

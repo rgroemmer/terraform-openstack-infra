@@ -1,19 +1,19 @@
 ## instance ##
 master_node_names = [
-  "delete_me_1",
-  "delete_me_2",
-  "delete_me_3"
+  "master_1",
+  "master_2",
+  "master_3"
 ]
 
 worker_node_names = [
-  "delete_me_w1",
-  "delete_me_w2"
+  "worker_1",
+  "worker_2"
 ]
 
-lb_name       = "delete_me_lb"
-image_id      = "41c4c9fc-c8d7-4475-8989-8103b0484128"
-flavor_name   = "c1.2"
-key_pair_name = "ske-key"
+lb_name     = "lb_1"
+image_id    = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+flavor_name = "c1.2"
+// key_pair_name = 
 // private_key_path = 
 
 # network vars

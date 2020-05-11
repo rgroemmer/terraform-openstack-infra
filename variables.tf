@@ -1,16 +1,3 @@
-# provider vars
-variable "username" {
-  description = "openstack username for provider auth"
-}
-
-variable "password" {
-  description = "openstack password for provider auth"
-}
-
-variable "tenant_name" {
-  description = "openstack project name"
-}
-
 # instance vars
 variable "image_id" {
   type = string

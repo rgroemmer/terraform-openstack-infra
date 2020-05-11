@@ -1,21 +1,20 @@
-# provider vars
-tenant_name = "ske-testing"
-
-# instance vars
-image_id    = "41c4c9fc-c8d7-4475-8989-8103b0484128"
-flavor_name = "c1.2"
+## instance ##
 master_node_names = [
-  "master_1",
-  "master_2",
-  "master_3"
+  "delete_me_1",
+  "delete_me_2",
+  "delete_me_3"
 ]
+
 worker_node_names = [
-  "worker_1",
-  "worker_2"
+  "delete_me_w1",
+  "delete_me_w2"
 ]
-lb_names = [
-  "lb_1"
-]
+
+lb_name       = "delete_me_lb"
+image_id      = "41c4c9fc-c8d7-4475-8989-8103b0484128"
+flavor_name   = "c1.2"
+key_pair_name = "ske-key"
+// private_key_path = 
 
 # network vars
 network_prefix  = "network"

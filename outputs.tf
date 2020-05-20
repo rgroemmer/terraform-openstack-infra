@@ -3,5 +3,5 @@ output "lb_public_ip" {
 }
 
 output "master_ipv6_addresses" {
-  value = [for instance in openstack_compute_instance_v2.ske_master : instance.access_ip_v6]
+  value = [for instance in openstack_compute_instance_v2.master_nodes : instance.access_ip_v6]
 }

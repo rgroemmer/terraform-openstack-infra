@@ -1,5 +1,5 @@
 resource "null_resource" "provisioner" {
-  depends_on = [openstack_compute_floatingip_associate_v2.fip_associate]
+  depends_on = [openstack_networking_floatingip_associate_v2.fip_associate]
   connection {
     type        = "ssh"
     host        = openstack_compute_floatingip_v2.fip.address
@@ -10,7 +10,7 @@ resource "null_resource" "provisioner" {
 
   provisioner "file" {
     content = templatefile("config/nginx.tmpl", {
-      ip_addrs = [for instance in openstack_compute_instance_v2.ske_master : instance.access_ip_v6],
+      ip_addrs = [for instance in openstack_compute_instance_v2.master_nodes : instance.access_ip_v6],
       port     = 6443
     })
     destination = "/tmp/nginx.conf"

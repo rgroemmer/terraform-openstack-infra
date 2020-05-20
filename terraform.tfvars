@@ -13,7 +13,7 @@ worker_node_names = [
 lb_name     = "lb_1"
 image_id    = "38e194d3-16b9-43a7-af1d-9ffcaa98c746" // ubuntu_k8s_1.18.2_docker
 flavor_name = "c1.2"
-// key_pair_name = ""
+// key_pair_name    = ""
 // private_key_path = ""
 
 # network vars
@@ -24,47 +24,12 @@ ext_ports = {
     min      = 22
     max      = 22
     protocol = "tcp"
-  },
-  api = {
-    min      = 6443
-    max      = 6443
-    protocol = "tcp"
   }
 }
 int_ports = {
-  etcd = {
-    min      = 2379
-    max      = 2380
+  ssh = {
+    min      = 22
+    max      = 22
     protocol = "tcp"
-  },
-  api = {
-    min      = 6443
-    max      = 6443
-    protocol = "tcp"
-  },
-  kubelet = {
-    min      = 10250
-    max      = 10250
-    protocol = "tcp"
-  },
-  scheduler = {
-    min      = 10251
-    max      = 10251
-    protocol = "tcp"
-  },
-  controller = {
-    min      = 10252
-    max      = 10252
-    protocol = "tcp"
-  },
-  node_port_tcp = {
-    min      = 30000
-    max      = 32767
-    protocol = "tcp"
-  },
-  node_port_udp = {
-    min      = 30000
-    max      = 32767
-    protocol = "udp"
   }
 }
